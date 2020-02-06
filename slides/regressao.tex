@@ -1,0 +1,472 @@
+% ### Uses XeLaTeX ### %
+% ### Needs beamer-master ### %
+\documentclass[aspectratio=169]{beamer} %. Aspect Ratio 16:9
+\usetheme{AI2} % beamerthemeSprace.sty
+% DATA FOR FOOTER
+\date{2020}
+\title{}
+\author{}
+\institute{Advanced Institute for Artificial Intelligence (AI2)}
+
+\usetikzlibrary{calc,chains,shadows}
+\usepackage{tikz}
+\usepackage{subfigure}
+
+\begin{document}    
+% ####################################
+% FIRST SLIDE 						:: \SliTit{<Title of the Talk>}{<Author Name>}{<Intitution>}
+% SLIDE SUB-TITLE					:: \SliSubTit{<Title of the Chapter>}{<Title of the Section>}
+% SLIDE WITH TITLE 					:: \SliT{<Title>}{Content}
+% SLIDE NO TITLE 						:: \Sli{<Content>} 
+% SLIDE DOUBLE COLUMN WITH TITLE 	:: \SliDT{<Title>}{<First Column>}{<Second Column>}
+% SLIDE DOUBLE COLUMN NO TITLE 		:: \SliD{<First Column>}{<Second Column>}
+% SLIDE ADVANCED WITH TITLE 			:: \SliAdvT{<Title>}{<Content>}
+% SLIDE ADVANCED  NO TITLE 			:: \SliAdv{<Content>}
+% SLIDE ADVANCED DOUBLE TITLE 		:: SliAdvDT{<Title>}{<First Column>}{<Second Column>}
+% SLIDE ADVANCED DOUBLE NO TITLE 	:: SliAdvD{<First Column>}{<Second Column>}
+% ITEMIZE 							:: \begin{itemize}  \IteOne{1st Level} \IteTwo {2nd Level} \IteThr{3rd Level} \end{itemize}
+% SECTION 							:: \secx{Section} | \secxx{Sub-Section}
+% COLOR BOX 						:: \blu{blue} + \red{red} + \yel{yellow} + \gre{green}
+% FRAME 							:: \fra{sprace} \frab{blue} \frar{red} + \fray{yellow} + \frag{green}	
+% REFERENCE						:: \refer{<doi number>}
+% FIGURE 							::  \img{X}{Y}{<scale>}{Figures/.png} 
+% FIGURE							:: \begin{center}\includegraphics[scale=<#>]{Figures/.png}\end{center}
+% PROJECT STATUS					:: \planned\~    \started\~   \underway\~   \done\~   
+% EXERCICIO							:: \Exe{<#>}{<text>}
+% STACKREL							:: \underset{<down>}{<up>}
+% FLUSH LEFT						:: \begin{flalign*}  & <1st equation> & \\  & <12nd equation>  & \\ \end{flalign*}
+% REAL / IMAGINAY					:: \Re / \Im
+% SLASH								:: \sl{} or \sl
+% BOLD MATH							:: \pmb{<>}
+% ####################################
+%
+% FIRST SLIDE :: DO NOT BREAK LINE !!!
+\SliTit{Aprendizado Não-Supervisionado}{Advanced Institute for Artificial Intelligence}{https://advancedinstitute.ai}
+
+% SLIDE WITH TITLE
+\SliT{Aprendizado Não-Supervisionado (\textit{Clustering}): Definição}{
+\secx{Agrupamento (\textit{Clustering}): O que é?}
+
+\begin{itemize}
+    \item Em alguns domínios, gostaríamos de "classificar" exemplos em grupos semelhantes
+    \item Porém, não possuímos rótulos de classes na base de treinamento
+\end{itemize}
+
+\secx{Exemplos}
+
+\begin{itemize}
+    \item \textbf{Agrupar} consumidores de uma plataforma web
+    \item \textbf{Agrupar} documentos de acordo com seu tipo, tópico, etc
+    \item \textbf{Identificar} anomalias e fraudes
+\end{itemize}
+
+}
+
+\Sli{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\columnwidth]{figs/clustering_example_1.png}
+    \label{fig:my_label}
+\end{figure}
+}
+\Sli{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\columnwidth]{figs/clustering_example_2.png}
+    \label{fig:my_label}
+\end{figure}
+}
+
+\Sli{
+\secx{Conceitos (Everitt, 1974)}
+
+\begin{itemize}
+    \item Um \textf{grupo} (\textit{cluster}) é um conjunto de entidades semelhantes entre si, enquanto entidades pertencentes a grupos diferentes não são semelhantes entre si
+    \item A \textbf{distância} (diferença) entre quaisquer 2 instâncias em um mesmo grupo é menor que a distância entre qualquer dupla de instâncias pertencentes a grupos distintos
+\end{itemize}
+}
+
+\SliT{Mais Formalmente......}{
+
+    
+
+\begin{block}{Agrupamento em partições rígidas}
+\begin{itemize}
+    \item Agrupar objetos, designando instâncias $\boldsymbol{X}$ em grupos $\boldsymbol{C} = \{C_1,\dots,C_k\}$, tal que:
+    \item $C_1 \cup \dots \cup C_k = \boldsymbol{X}$: Todos as instâncias devem ser designadas a um grupo
+    \item $C_i \neq \empty$: Todos os grupos possuem pelo menos $1$ instância
+    \item $C_i \cap C_j = \empty$: Cada instância possue apenas um rótulo
+    \item \textbf{Objetivo:} Encontrar mapeamento $f$:
+    
+\end{itemize}
+\begin{equation*}
+       f: \boldsymbol{X} \rightarrow \{1,\dots,k\},
+    \end{equation*}
+\end{block}
+atribuindo cada instância a um grupo
+
+}
+
+\Sli{
+\begin{itemize}
+    \item Enumerar e avaliar todas as partições possíveis é inviável para qualquer aplicação não-trivial
+\end{itemize}
+}
+
+\Sli{
+    \secx{Como definir que instâncias são similares o suficiente para serem colocadas no mesmo grupo?}
+}
+
+\Sli{
+    \secx{Diferenças podem ser subjetivas}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.4\columnwidth]{figs/clustering_illustration_girldog.png}
+        \label{fig:my_label}
+    \end{figure}
+}
+
+\Sli{
+    \begin{itemize}
+        \item Assim como na \textit{classificação}, algoritmos de agrupamento se baseiam nos atributos para tentar formar agrupamentos bem definidos
+    \end{itemize}
+}
+\Sli{
+    \secx{Avaliar qual seria o melhor agrupamento pode ser desafiador}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.4\columnwidth]{figs/clustering_base_example.png}
+        \label{fig:my_label}
+    \end{figure}
+}
+
+\Sli{
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.4\columnwidth]{figs/clustering_base_example.png}
+        \includegraphics[width=0.4\columnwidth]{figs/clustering_base_example_2.png}
+        \includegraphics[width=0.4\columnwidth]{figs/clustering_base_example_3.png}
+        \includegraphics[width=0.4\columnwidth]{figs/clustering_base_example_5.png}
+    \end{figure}
+}
+
+\Sli{
+    \begin{itemize}
+        \item Assim como para classificação, cada algoritmo de agrupamento segue alguma estratégia e suposições para definir um agrupamento adequado
+    \end{itemize}
+}
+\SliTit{Algoritmo K-Médias (\textit{K-Means})}{}{}
+
+\SliT{K-Means}{
+    \secx{Separa os dados de treinamento em $K$ grupos}
+    
+    
+    \secxx{Algoritmo amplamente utilizado na prática}
+    \begin{itemize}
+        \item Simples
+        \item Fácil de se interpretar
+        \item É eficiente computacionalmente
+    \end{itemize}
+
+}
+\SliT{Algoritmo K-Means}{
+    \secx{Partindo de um número conhecido de grupos $K$:}
+    \begin{enumerate}
+        \item Selecione $K$ \textit{centróides} (instâncias que representarão cada grupo)
+        \item Atribua cada instância ao cluster que tiver o centróide mais próximo
+        \item Recomputa o centróide de acordo com a nova separação
+        \item Repita os 2 passos acima até a convergência
+    \end{enumerate}
+}
+
+\SliT{Exemplo Ilustrativo}{
+Com $K=3$, iniciamos definindo $3$ centróides
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{figs/exemplo_k_means_1.png}
+\end{figure}
+
+}
+
+\Sli{
+Rotular todos os exemplos de acordo com o centróide mais próximo
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{figs/exemplo_k_means_2.png}
+\end{figure}
+
+
+}
+
+\Sli{
+Atualizar todos os centróides
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{figs/exemplo_k_means_3.png}
+\end{figure}
+
+
+}
+
+\Sli{
+Atualizar grupos, e repetir até convergência
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\columnwidth]{figs/exemplo_k_means_4.png}
+\end{figure}
+
+
+}
+
+\SliT{Exemplo com $K=2$}{
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\columnwidth]{figs/clustering_base_example.png}
+    \includegraphics[width=0.4\columnwidth]{figs/clustering_base_example_2.png}
+\end{figure}
+}
+
+\SliT{Parâmetros}{
+\begin{enumerate}
+    \item $K$
+    \item Métrica de distância
+    \item Inicialização dos centróides
+\end{enumerate}
+}
+
+\SliT{Métricas de distância}{
+\secx{Distância Euclidiana}
+\begin{equation}
+    d_{euc}(\boldsymbol{a},\boldsymbol{b}) = \sqrt{\sum_{m=1}^M (a_m - b_m)^2}
+\end{equation}
+
+\begin{itemize}
+    \item Distância "comum" entre dois pontos 
+\end{itemize}
+
+}
+
+\SliT{Exemplo Distância Euclidiana}{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\columnwidth]{figs/distance_newyork.png}
+\end{figure}
+}
+
+\SliT{Exemplo Distância Euclidiana}{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\columnwidth]{figs/distance_ny_euclidiana.png}
+\end{figure}
+}
+
+\Sli{
+\secx{Distância Manhattan}
+\begin{equation}
+    d_{man}(\boldsymbol{a},\boldsymbol{b}) =\sum_{m=1}^M |a_m - b_m|
+\end{equation}
+
+\begin{itemize}
+    \item Na analogia com distâncias espaciais, seria como "percorrer as ruas" 
+\end{itemize}
+
+}
+
+\SliT{Exemplo Distância Manhattan}{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\columnwidth]{figs/distance_ny_manhattan.png}
+\end{figure}
+}
+
+\SliT{Comparação entre as distâncias}{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\columnwidth]{figs/example_distances.jpg}
+\end{figure}
+}
+
+\SliT{Inicialização dos centróides}{
+\begin{itemize}
+    \item A inicialização dos centróides afeta no resultado final a na velocidade de convergência
+    \item Portanto, a estratégia de inicialização afeta na efetividade do algoritmo
+\end{itemize}
+}
+
+
+\Sli{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.86\columnwidth]{figs/exemplo_init1.png}
+\end{figure}
+}
+
+\Sli{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.86\columnwidth]{figs/exemplo_init2.png}
+\end{figure}
+}
+
+\SliT{Como inicializar os centróides?}{
+\begin{itemize}
+    \item Executar múltiplas vezes e selecionar os melhores clusters 
+    \item Seleção informada de centróides distantes entre si
+\end{itemize}
+}
+
+\SliT{Limitações do KMeans}{
+\secx{Grupos de tamanhos diferentes}
+\begin{figure}
+ \center
+\subfigure[ref1][Dados Gerados] {\includegraphics[width=0.4\columnwidth]{figs/exemplo_diftam_original.png}}
+\qquad
+\subfigure[ref2][$K=3$]{\includegraphics[width=0.4\columnwidth]{figs/exemplo_diftam_k3.png}}
+\end{figure}
+}
+
+
+\SliT{Limitações do KMeans}{
+\secx{Grupos de densidades diferentes}
+\begin{figure}
+ \center
+\subfigure[ref1][Dados Gerados] {\includegraphics[width=0.4\columnwidth]{figs/exemplo_densidade_original.png}}
+\qquad
+\subfigure[ref2][$K=3$]{\includegraphics[width=0.4\columnwidth]{figs/exemplo_densidade_k3.png}}
+\end{figure}
+}
+
+\SliT{Limitações do KMeans}{
+\secx{Formas não globulares}
+\begin{figure}
+ \center
+\subfigure[ref1][Dados Gerados] {\includegraphics[width=0.4\columnwidth]{figs/exemplo_globu_original.png}}
+\qquad
+\subfigure[ref2][$K=2$]{\includegraphics[width=0.4\columnwidth]{figs/exemplo_globu_k2.png}}
+\end{figure}
+}
+
+\SliT{Aliviando esses problemas aumentando o parâmetro $K$}
+{
+\begin{figure}
+ \center
+\subfigure[ref1][Dados Gerados] {\includegraphics[width=0.4\columnwidth]{figs/exemplo_diftam_original.png}}
+\qquad
+\subfigure[ref2][Mais grupos]{\includegraphics[width=0.4\columnwidth]{figs/exemplo_diftam_solucao.png}}
+\end{figure}
+
+}
+
+\Sli{
+\begin{figure}
+ \center
+\subfigure[ref1][Dados Gerados] {\includegraphics[width=0.4\columnwidth]{figs/exemplo_densidade_original.png}}
+\qquad
+\subfigure[ref2][Mais grupos]{\includegraphics[width=0.4\columnwidth]{figs/exemplo_densidade_solucao.png}}
+\end{figure}
+
+}
+
+
+\Sli{
+\begin{figure}
+ \center
+\subfigure[ref1][Dados Gerados] {\includegraphics[width=0.4\columnwidth]{figs/exemplo_globu_original.png}}
+\qquad
+\subfigure[ref2][Mais grupos]{\includegraphics[width=0.4\columnwidth]{figs/exemplo_globu_solucao.png}}
+\end{figure}
+
+}
+
+
+\SliT{Pré e Pós-processamentos para o KMeans}{
+\secxx{Pré-processamento}
+\begin{itemize}
+    \item Normalização
+    \item{Eliminação de outliers}
+\end{itemize}
+\secxx{Pós-processamento}
+\begin{itemize}
+    \item Eliminar pequenos clusters
+    \item Dividir grupos com instâncias muito distantes entre si
+    \item Unir grupos com instâncias muito próximas
+\end{itemize}
+}
+
+\SliTit{DBSCAN}{}{}
+
+\SliT{DBSCAN}
+{
+\begin{itemize}
+    \item O KMeans é um algoritmo baseado em protótipos
+    \item Algoritmos baseados em densidade definem clusteres separando regiões com alta concentração de instâncias
+    \item O \textit{DBSCAN} é um dos algoritmos mais utilizados dentre os baseados em densidade
+\end{itemize}
+}
+
+\Sli{
+\secxx{Separa as instâncias da base em 3 tipos}
+\begin{itemize}
+    \item \textbf{Core} - Pontos que estão no centro de uma concentração de instâncias (semelhante à ideia de centróide)
+    \item \textbf{Border} - Pontos que fazem parte de um grupo mas não estão no centro dele, formando a "borda".
+    \item \textbf{Noise} - Pontos isolados das outras instâncias
+\end{itemize}
+}
+
+\SliT{Algoritmo}{
+\begin{enumerate}
+    \item Percorre e base de treinamento e rotula cada exemplo como \textbf{core}, \textbf{border}, ou \textbf{noise}.
+    \item Elimina todos os exemplos rotulados como \textbf{noise}
+    \item Insere uma aresta entre cada par de exemplos \textbf{core} próximos uns dos outros
+    \item Cada componente conexo resulta em um cluster
+    \item Cada \textbf{border} é atribuido ao \textbf{core} correspondente
+\end{enumerate}
+}
+
+\Sli{
+\secx{Como exatamente rotular cada instância?}
+\secxx{DBSCAN possui 2 parâmetros: $eps$ e $minSamples$}
+\begin{itemize}
+    \item Todos as instâncias que possuem no mínimo $minSamples$ pontos a uma distância máxima de $eps$ (vizinhança) são \textbf{core}
+    \item Se um ponto possui menos que $minSamples$ vizinhos mas está na vizinhança de algum ponto core, ele é \textbf{border}
+    \item Todos os pontos não classificados como core ou border são \textbf{noise}
+\end{itemize}
+}
+
+\Sli{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\columnwidth]{figs/dbscan_pontos.png}
+\end{figure}
+}
+
+\SliT{Exemplo definição de pontos}{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\columnwidth]{figs/exemplo_tipoponto.png}
+\end{figure}
+}
+
+\SliT{Exemplo grupos}{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\columnwidth]{figs/exemplo_clusters.png}
+\end{figure}
+}
+
+\Sli{
+\secx{Vantagens do DBSCAN}
+\begin{itemize}
+    \item Resistente a ruído
+    \item Consegue lidar com grupos de diferentes tamanhos e formas
+\end{itemize}
+\secx{Desvantagens do DBSCAN}
+\begin{itemize}
+    \item Não consegue capturar grupos com diferentes densidades
+\end{itemize}
+}
+
+%%Colocar exemplos de kmeans e dbscan
+\end{document}
